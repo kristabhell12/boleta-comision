@@ -29,20 +29,17 @@ body {
 }
 
 .title {
-    background: #2e7d32;
+    background: #0c2d5a;
     color: white;
     padding: 8px;
-    margin-top: 10px;
+    margin-top: 20px;
     font-weight: bold;
 }
 
-.field {
-    margin-top: 15px;
-}
-
-.line {
-    border-bottom: 1px solid black;
-    height: 25px;
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
 }
 
 .row {
@@ -54,7 +51,7 @@ button {
     margin-top: 20px;
     width: 100%;
     padding: 12px;
-    background: #2e7d32;
+    background: #0c2d5a;
     color: white;
     border: none;
     font-size: 16px;
@@ -81,10 +78,8 @@ BOLETA DE COMISIÓN POR VIAJE
 </div>
 
 <!-- FORMULARIO -->
-<div class="field">
 <label>NOMBRES Y APELLIDOS</label>
-<input id="nombre" style="width:100%;">
-</div>
+<input id="nombre">
 
 <div class="row">
 <div style="flex:1">
@@ -98,76 +93,154 @@ BOLETA DE COMISIÓN POR VIAJE
 </div>
 </div>
 
-<div class="field">
 <label>FECHAS</label>
 <div class="row">
 <input type="date" id="fecha1">
 <input type="date" id="fecha2">
 </div>
-</div>
 
-<div class="field">
 <label>HORAS</label>
 <div class="row">
 <input type="time" id="hora1">
 <input type="time" id="hora2">
 </div>
-</div>
 
-<div class="field">
 <label>MOTIVO</label>
-<textarea id="motivo" style="width:100%; height:60px;"></textarea>
-</div>
+<textarea id="motivo"></textarea>
 
-<div class="field">
-<label>LA PAZ</label>
+<label>FECHA (LA PAZ)</label>
 <input type="date" id="fechaFinal">
-</div>
 
 <button onclick="generarPDF()">Descargar PDF</button>
 
 <script>
 async function generarPDF() {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
 
-    let y = 15;
+    const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "letter"
+    });
 
-    // Título
-    doc.setFontSize(14);
-    doc.text("BOLETA DE COMISIÓN POR VIAJE", 25, y);
-    y += 10;
+    let y = 25;
 
+    const logo1 = await cargarImagen("https://raw.githubusercontent.com/kristabhell12/boleta-comision/refs/heads/main/logo%20umsa.png");
+    const logo2 = await cargarImagen("https://raw.githubusercontent.com/kristabhell12/boleta-comision/refs/heads/main/log-cs.quimicas.png");
+
+    // Logos (más separados)
+    doc.addImage(logo1, "PNG", 15, 10, 22, 22);
+    doc.addImage(logo2, "PNG", 173, 10, 22, 22);
+
+    // Encabezado
+    doc.setFontSize(12);
+    doc.text("UNIVERSIDAD MAYOR DE SAN ANDRÉS", 105, 20, null, null, "center");
+    doc.text("CARRERA DE CIENCIAS QUÍMICAS", 105, 26, null, null, "center");
+
+    // 🔵 FRANJA AZUL MÁS ABAJO
+    doc.setFillColor(12, 45, 90);
+    doc.rect(20, 38, 170, 8, "F");
+
+    doc.setTextColor(255,255,255);
+    doc.text("BOLETA DE COMISIÓN POR VIAJE", 105, 43, null, null, "center");
+
+    doc.setTextColor(0,0,0);
+
+    y = 55;
+
+    // Datos
     doc.setFontSize(10);
 
-    doc.text("Nombres: " + val("nombre"), 10, y); y+=8;
-    doc.text("Item: " + val("item"), 10, y); y+=8;
-    doc.text("Días: " + val("dias"), 10, y); y+=8;
+    doc.text("NOMBRES Y APELLIDOS:", 20, y);
+    doc.line(70, y, 190, y);
+    doc.text(val("nombre"), 72, y-1);
 
-    doc.text("Fecha Desde: " + val("fecha1"), 10, y); y+=8;
-    doc.text("Fecha Hasta: " + val("fecha2"), 10, y); y+=8;
+    y += 10;
+    doc.text("N° ITEM:", 20, y);
+    doc.line(45, y, 90, y);
+    doc.text(val("item"), 47, y-1);
 
-    doc.text("Hora Desde: " + val("hora1"), 10, y); y+=8;
-    doc.text("Hora Hasta: " + val("hora2"), 10, y); y+=8;
+    doc.text("DÍAS:", 110, y);
+    doc.line(130, y, 190, y);
+    doc.text(val("dias"), 132, y-1);
 
-    doc.text("Motivo:", 10, y); y+=6;
-    doc.text(val("motivo"), 10, y); y+=12;
+    y += 10;
+    doc.text("FECHAS:", 20, y);
 
-    doc.text("La Paz: " + val("fechaFinal"), 10, y);
+    y += 6;
+    doc.text("DE:", 20, y);
+    doc.line(35, y, 90, y);
+    doc.text(val("fecha1"), 37, y-1);
 
-    // Líneas de firma
+    doc.text("A:", 110, y);
+    doc.line(120, y, 190, y);
+    doc.text(val("fecha2"), 122, y-1);
+
+    y += 10;
+    doc.text("HORAS:", 20, y);
+
+    y += 6;
+    doc.text("DE:", 20, y);
+    doc.line(35, y, 90, y);
+    doc.text(val("hora1"), 37, y-1);
+
+    doc.text("A:", 110, y);
+    doc.line(120, y, 190, y);
+    doc.text(val("hora2"), 122, y-1);
+
+    y += 12;
+    doc.text("MOTIVO:", 20, y);
+
+    y += 5;
+    doc.rect(20, y, 170, 30);
+    doc.text(val("motivo"), 22, y+5);
+
+    y += 40;
+    doc.text("LA PAZ " + val("fechaFinal"), 60, y);
+
+    // Firmas
     y += 30;
-    doc.text("_____________________", 20, y);
-    doc.text("DOCENTE", 30, y + 5);
 
-    doc.text("_____________________", 120, y);
-    doc.text("DIRECTOR", 130, y + 5);
+    doc.line(30, y, 90, y);
+    doc.setFontSize(9);
+    doc.text("DOCENTE RESPONSABLE", 60, y + 5, null, null, "center");
+
+    doc.line(120, y, 180, y);
+    doc.text("Ph.D. Heriberto Castañeta Maroni", 150, y + 5, null, null, "center");
+    doc.text("Director", 150, y + 10, null, null, "center");
+    doc.text("Carrera de Ciencias Químicas", 150, y + 15, null, null, "center");
+
+    // VoBo
+    y += 25;
+    doc.text("Vo. Bo.", 30, y);
+    doc.line(45, y, 90, y);
+
+    // Sello
+    doc.setTextColor(150,150,150);
+    doc.setFontSize(28);
+    doc.text("VALIDADO", 105, 200, null, null, "center", 45);
 
     doc.save("boleta_comision.pdf");
 }
 
 function val(id){
     return document.getElementById(id).value;
+}
+
+function cargarImagen(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL("image/png"));
+        };
+        img.src = url;
+    });
 }
 </script>
 
