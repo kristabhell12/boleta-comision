@@ -1,1 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Boleta de Comisión</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header img {
+    height: 70px;
+}
+
+.center {
+    text-align: center;
+}
+
+.title {
+    background: #2e7d32;
+    color: white;
+    padding: 8px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.field {
+    margin-top: 15px;
+}
+
+.line {
+    border-bottom: 1px solid black;
+    height: 25px;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <img src="https://raw.githubusercontent.com/kristabhell12/boleta-comision/refs/heads/main/logo%20umsa.png">
+    
+    <div class="center">
+        <strong>UNIVERSIDAD MAYOR DE SAN ANDRÉS</strong><br>
+        CARRERA DE CIENCIAS QUÍMICAS
+    </div>
+
+    <img src="https://raw.githubusercontent.com/kristabhell12/boleta-comision/refs/heads/main/log-cs.quimicas.png">
+</div>
+
+<div class="title center">
+BOLETA DE COMISIÓN POR VIAJE
+</div>
+
+<!-- FORMULARIO -->
+<div class="field">
+<label>NOMBRES Y APELLIDOS</label>
+<input id="nombre" style="width:100%;">
+</div>
+
+<div class="row">
+<div style="flex:1">
+<label>N° DE ITEM</label>
+<input id="item">
+</div>
+
+<div style="flex:1">
+<label>DÍAS</label>
+<input id="dias">
+</div>
+</div>
+
+<div class="field">
+<label>FECHAS</label>
+<div class="row">
+<input type="date" id="fecha1">
+<input type="date" id="fecha2">
+</div>
+</div>
+
+<div class="field">
+<label>HORAS</label>
+<div class="row">
+<input type="time" id="hora1">
+<input type="time" id="hora2">
+</div>
+</div>
+
+<div class="field">
+<label>MOTIVO</label>
+<textarea id="motivo" style="width:100%; height:60px;"></textarea>
+</div>
+
+<div class="field">
+<label>LA PAZ</label>
+<input type="date" id="fechaFinal">
+</div>
+
+<button onclick="generarPDF()">Descargar PDF</button>
+
+<script>
+async function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 15;
+
+    // Título
+    doc.setFontSize(14);
+    doc.text("BOLETA DE COMISIÓN POR VIAJE", 25, y);
+    y += 10;
+
+    doc.setFontSize(10);
+
+    doc.text("Nombres: " + val("nombre"), 10, y); y+=8;
+    doc.text("Item: " + val("item"), 10, y); y+=8;
+    doc.text("Días: " + val("dias"), 10, y); y+=8;
+
+    doc.text("Fecha Desde: " + val("fecha1"), 10, y); y+=8;
+    doc.text("Fecha Hasta: " + val("fecha2"), 10, y); y+=8;
+
+    doc.text("Hora Desde: " + val("hora1"), 10, y); y+=8;
+    doc.text("Hora Hasta: " + val("hora2"), 10, y); y+=8;
+
+    doc.text("Motivo:", 10, y); y+=6;
+    doc.text(val("motivo"), 10, y); y+=12;
+
+    doc.text("La Paz: " + val("fechaFinal"), 10, y);
+
+    // Líneas de firma
+    y += 30;
+    doc.text("_____________________", 20, y);
+    doc.text("DOCENTE", 30, y + 5);
+
+    doc.text("_____________________", 120, y);
+    doc.text("DIRECTOR", 130, y + 5);
+
+    doc.save("boleta_comision.pdf");
+}
+
+function val(id){
+    return document.getElementById(id).value;
+}
+</script>
+
+</body>
+</html>
